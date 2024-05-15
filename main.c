@@ -12,28 +12,28 @@ void moveFile(const char *sourcePath, const char *destinationPath)
 {
    if (rename(sourcePath, destinationPath) != 0)
    {
-      printf("\033[0;31mDosya tasima hatasi\033[0m \n");
+      printf("\033[0;31m Transferring error\033[0m \n");
    }
    else
    {
-      printf("\033[0;33m%s isimli dosya <  %s \033[0m noktasina tasindi \n", sourcePath, destinationPath);
+      printf("\033[0;33m%s named file > moved to %s \033[0m\n", sourcePath, destinationPath);
    }
 }
 
 void createFolders(const char *sourcePath)
 {
 
-   const char arr[6][21] = {"MetinBelgeleri", "Exeler", "Resimler", "RarDosyalari", "PdfDosyalari", "FarkliDosyalar"};
+
+   const char arr[6][30] = {"Music", "Programs", "Video", "Compressed", "Documents", "OtherFiles"};
    char checkerPath[256];
    int check;
 
    for (int i = 0; i < 6; i++)
-   { // i<6 yazan kısmı arr 'ın boyutuna göre değiştirmelisin
+   {
       snprintf(checkerPath, sizeof(checkerPath), "%s/%s", sourcePath, arr[i]);
       DIR *checker = opendir(checkerPath);
       if (checker)
       {
-         printf("%s acilip kapandi\n", arr[i]);
          closedir(checker);
       }
       else
@@ -41,11 +41,11 @@ void createFolders(const char *sourcePath)
          check = mkdir(checkerPath);
          if (!check)
          {
-            printf("%s olusturuldu.\n", arr[i]);
+            printf("%s created.\n", arr[i]);
          }
          else
          {
-            printf("Hata");
+            printf("Error\n");
          }
       }
    }
@@ -66,35 +66,34 @@ void FileOrganizer(const char *sourceDir)
             snprintf(sourcePath, sizeof(sourcePath), "%s/%s", sourceDir, entry->d_name);
             // bu fonskiyon sourcePath'e sığabileceği kadar miktarda güvenli
             // şekilde istenilen karakterleri yükler
-            if (strstr(entry->d_name, ".txt") != NULL)
+            if ((strstr(entry->d_name, ".txt") != NULL) || (strstr(entry->d_name, ".pdf") != NULL) || (strstr(entry->d_name, ".pptx") != NULL))
             { // dosya uzantısını kontrol eder
-               snprintf(destinationPath, sizeof(destinationPath), "%s/MetinBelgeleri/%s", sourceDir, entry->d_name);
-               printf("%s", destinationPath);
+               snprintf(destinationPath, sizeof(destinationPath), "%s/Documents/%s", sourceDir, entry->d_name);
                moveFile(sourcePath, destinationPath);
             }
-            else if (strstr(entry->d_name, ".exe") != NULL )
+            else if ((strstr(entry->d_name, ".exe") != NULL) || (strstr(entry->d_name, ".bat") != NULL))
             {
-               snprintf(destinationPath, sizeof(destinationPath), "%s/Exeler/%s", sourceDir, entry->d_name);
+               snprintf(destinationPath, sizeof(destinationPath), "%s/Programs/%s", sourceDir, entry->d_name);
                moveFile(sourcePath, destinationPath);
             }
-            else if ((strstr(entry->d_name, ".jpg") != NULL) || (strstr(entry->d_name, ".png") != NULL) || (strstr(entry->d_name, ".jpeg") != NULL))
+            else if ((strstr(entry->d_name, ".jpg") != NULL) || (strstr(entry->d_name, ".png") != NULL) || (strstr(entry->d_name, ".jpeg") != NULL) || (strstr(entry->d_name, ".mp4") != NULL))
             {
-               snprintf(destinationPath, sizeof(destinationPath), "%s/Resimler/%s", sourceDir, entry->d_name);
+               snprintf(destinationPath, sizeof(destinationPath), "%s/Video/%s", sourceDir, entry->d_name);
                moveFile(sourcePath, destinationPath);
             }
             else if ((strstr(entry->d_name, ".zip") != NULL) || (strstr(entry->d_name, ".rar") != NULL))
             {
-               snprintf(destinationPath, sizeof(destinationPath), "%s/RarDosyalari/%s", sourceDir, entry->d_name);
+               snprintf(destinationPath, sizeof(destinationPath), "%s/Compressed/%s", sourceDir, entry->d_name);
                moveFile(sourcePath, destinationPath);
             }
-            else if (strstr(entry->d_name, ".pdf") != NULL)
+            else if ((strstr(entry->d_name, ".mp3") != NULL) || (strstr(entry->d_name, ".wav") != NULL))
             {
-               snprintf(destinationPath, sizeof(destinationPath), "%s/PdfDosyalari/%s", sourceDir, entry->d_name);
+               snprintf(destinationPath, sizeof(destinationPath), "%s/Music/%s", sourceDir, entry->d_name);
                moveFile(sourcePath, destinationPath);
             }
             else
             {
-               snprintf(destinationPath, sizeof(destinationPath), "%s/FarkliDosyalar/%s", sourceDir, entry->d_name);
+               snprintf(destinationPath, sizeof(destinationPath), "%s/OtherFiles/%s", sourceDir, entry->d_name);
                moveFile(sourcePath, destinationPath);
             }
          }
@@ -103,16 +102,18 @@ void FileOrganizer(const char *sourceDir)
    }
    else
    {
-      printf("\033[0;31mDosyayi acarken bir sorun yasandi!\033[0m \n");
+      printf("\033[0;31mThere was a problem while opening a folder!\033[0m \n");
    }
 }
 
 int main()
 {
-   const char *sourceDir = "C:/Users/ASUS/Downloads";
+   const char *sourceDir = "C:/Users/Ceyhun/Downloads"; // TODO: find a way to fix this shit
    // signal(SIGINT,cleaner);
    printf("\033[0;36mOrganizer started!\033[0m \n");
    createFolders(sourceDir);
    FileOrganizer(sourceDir);
+   printf("\033[0;36mDone!\033[0m \n");
+
    return 0;
 }
